@@ -6,25 +6,21 @@ on:
   pull_request:
     branches: [ main ]
 
-env:
-  # Opts in to running JavaScript actions on Node.js 24 to acknowledge the deprecation of Node.js 20
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   install:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 26
 
       - name: Cache node modules
         id: cache-nodemodules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -38,15 +34,15 @@ jobs:
     needs: install
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 26
 
       - name: Restore node modules from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -59,15 +55,15 @@ jobs:
     needs: install
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 26
 
       - name: Restore node modules from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -80,15 +76,15 @@ jobs:
     needs: [lint, test]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 26
 
       - name: Restore node modules from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
