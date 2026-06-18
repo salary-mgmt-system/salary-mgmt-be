@@ -1,0 +1,2 @@
+export { default as databaseConfig } from './database.config.js';
+export { default as appConfig } from './app.config.js';
