@@ -1,18 +1,32 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
-import { DatabaseModule } from './database/database.module.js';
-import { databaseConfig, appConfig } from './config/index.js';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { DatabaseModule } from './database/database.module';
+import { databaseConfig, appConfig, validateEnv } from './config/index';
+import { EmployeesModule } from './employees/employees.module';
+import { SalariesModule } from './salaries/salaries.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { InsightsModule } from './insights/insights.module';
 
 @Module({
   imports: [
+    // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig, appConfig],
+      validate: validateEnv,
       envFilePath: '.env',
     }),
+
+    // Database
     DatabaseModule,
+
+    // Feature modules
+    EmployeesModule,
+    SalariesModule,
+    AnalyticsModule,
+    InsightsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
