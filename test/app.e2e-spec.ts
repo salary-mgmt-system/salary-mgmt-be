@@ -93,7 +93,7 @@ describe('AppController (e2e)', () => {
         baseSalary: originalBaseSalary + 10000,
         bonus: 12000,
         effectiveDate: '2026-06-01',
-        reason: 'E2E Test Promotion',
+        reason: 'Test Promotion',
       };
 
       const putRes = await request(app.getHttpServer())

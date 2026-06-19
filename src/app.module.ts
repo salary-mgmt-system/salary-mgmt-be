@@ -16,7 +16,7 @@ import { InsightsModule } from './insights/insights.module';
       isGlobal: true,
       load: [databaseConfig, appConfig],
       validate: validateEnv,
-      envFilePath: '.env',
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
     }),
 
     // Database
