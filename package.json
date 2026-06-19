@@ -79,6 +79,27 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
+    "coveragePathIgnorePatterns": [
+      "node_modules",
+      "main.ts",
+      ".module.ts",
+      "database/migrations",
+      "database/seeds",
+      "database/data-source.ts",
+      "config/app.config.ts",
+      "config/database.config.ts",
+      "config/index.ts",
+      "common/interfaces",
+      "common/dto/index.ts"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 98,
+        "functions": 98,
+        "lines": 98,
+        "statements": 98
+      }
+    },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }

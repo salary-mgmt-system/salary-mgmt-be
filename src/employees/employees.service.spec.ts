@@ -117,6 +117,41 @@ describe('EmployeesService', () => {
       expect(mockQueryBuilder.skip).toHaveBeenCalledWith(5);
       expect(mockQueryBuilder.take).toHaveBeenCalledWith(5);
     });
+
+    it('should sort by bonus', async () => {
+      await service.findAll({
+        page: 1,
+        pageSize: 10,
+        sortBy: 'bonus',
+        sortOrder: 'ASC',
+      });
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('salary.bonus', 'ASC');
+    });
+
+    it('should sort by firstName (non-salary field)', async () => {
+      await service.findAll({
+        page: 1,
+        pageSize: 10,
+        sortBy: 'firstName',
+        sortOrder: 'DESC',
+      });
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('employee.first_name', 'DESC');
+    });
+
+    it('should fallback to employeeCode sorting when invalid field is provided', async () => {
+      await service.findAll({
+        sortBy: 'invalidField',
+        sortOrder: 'ASC',
+      });
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('employee.employee_code', 'ASC');
+    });
+
+    it('should use default page and pageSize when they are not provided', async () => {
+      await service.findAll({});
+
+      expect(mockQueryBuilder.skip).toHaveBeenCalledWith(0);
+      expect(mockQueryBuilder.take).toHaveBeenCalledWith(10);
+    });
   });
 
   describe('findOne', () => {
@@ -138,6 +173,26 @@ describe('EmployeesService', () => {
       mockRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findOne('invalid-id')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should return null currentSalary if no current salary exists for employee', async () => {
+      const mockEmployeeNoCurrent = {
+        ...mockEmployee,
+        salaries: [
+          {
+            id: 'sal-2',
+            baseSalary: 90000,
+            bonus: 5000,
+            isCurrent: false,
+            effectiveDate: '2024-01-01',
+          },
+        ],
+      };
+      mockRepository.findOne.mockResolvedValueOnce(mockEmployeeNoCurrent);
+
+      const result = await service.findOne('mock-id');
+
+      expect(result.currentSalary).toBeNull();
     });
   });
 });
