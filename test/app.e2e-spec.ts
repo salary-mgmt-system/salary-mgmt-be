@@ -75,6 +75,90 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer()).get('/employees/not-a-uuid').expect(400);
   });
 
+  describe('/employees/:id/salary (PUT) & /employees/:id/salary-history (GET)', () => {
+    async function getFirstEmployeeId(): Promise<{ id: string; baseSalary: number }> {
+      const res = await request(app.getHttpServer()).get('/employees').expect(200);
+      const body = res.body as { data: { id: string; salaries: { baseSalary: number }[] }[] };
+      const employee = body.data[0];
+      return {
+        id: employee.id,
+        baseSalary: Number(employee.salaries[0]?.baseSalary || 0),
+      };
+    }
+
+    it('should successfully update salary and record audit history', async () => {
+      const { id: employeeId, baseSalary: originalBaseSalary } = await getFirstEmployeeId();
+
+      const updatePayload = {
+        baseSalary: originalBaseSalary + 10000,
+        bonus: 12000,
+        effectiveDate: '2026-06-01',
+        reason: 'E2E Test Promotion',
+      };
+
+      const putRes = await request(app.getHttpServer())
+        .put(`/employees/${employeeId}/salary`)
+        .send(updatePayload)
+        .expect(200);
+
+      expect(putRes.body).toHaveProperty('employee');
+      expect(putRes.body).toHaveProperty('currentSalary');
+      expect(putRes.body.employee.id).toBe(employeeId);
+      expect(Number(putRes.body.currentSalary.baseSalary)).toBe(updatePayload.baseSalary);
+      expect(Number(putRes.body.currentSalary.bonus)).toBe(updatePayload.bonus);
+      expect(putRes.body.currentSalary.effectiveDate).toBe(updatePayload.effectiveDate);
+      expect(putRes.body.currentSalary.isCurrent).toBe(true);
+
+      const getHistoryRes = await request(app.getHttpServer())
+        .get(`/employees/${employeeId}/salary-history`)
+        .expect(200);
+
+      const history = getHistoryRes.body as {
+        oldSalary: number;
+        newSalary: number;
+        reason: string;
+      }[];
+      expect(history.length).toBeGreaterThan(0);
+      expect(history[0]).toHaveProperty('oldSalary');
+      expect(history[0]).toHaveProperty('newSalary');
+      expect(history[0]).toHaveProperty('reason');
+      expect(Number(history[0].oldSalary)).toBe(originalBaseSalary);
+      expect(Number(history[0].newSalary)).toBe(updatePayload.baseSalary);
+      expect(history[0].reason).toBe(updatePayload.reason);
+    });
+
+    it('should return 400 Bad Request on invalid salary update payload', async () => {
+      const { id: employeeId } = await getFirstEmployeeId();
+      const invalidPayload = {
+        baseSalary: -5000,
+        bonus: 'invalid',
+        effectiveDate: 'invalid-date',
+      };
+
+      await request(app.getHttpServer())
+        .put(`/employees/${employeeId}/salary`)
+        .send(invalidPayload)
+        .expect(400);
+    });
+
+    it('should return 404 Not Found when employee does not exist', async () => {
+      const randomUuid = '00000000-0000-0000-0000-000000000000';
+      const updatePayload = {
+        baseSalary: 150000,
+        bonus: 10000,
+        effectiveDate: '2026-06-01',
+        reason: 'Missing Employee',
+      };
+
+      await request(app.getHttpServer())
+        .put(`/employees/${randomUuid}/salary`)
+        .send(updatePayload)
+        .expect(404);
+
+      await request(app.getHttpServer()).get(`/employees/${randomUuid}/salary-history`).expect(404);
+    });
+  });
+
   afterEach(async () => {
     await app.close();
   });
