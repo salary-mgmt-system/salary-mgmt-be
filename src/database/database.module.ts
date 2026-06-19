@@ -19,6 +19,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         migrationsRun: configService.get<string>('app.nodeEnv') === 'production',
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
         logging: configService.get<string>('app.nodeEnv') === 'development',
+        ssl:
+          configService.get<string>('app.nodeEnv') === 'production'
+            ? { rejectUnauthorized: false }
+            : false,
       }),
     }),
   ],
