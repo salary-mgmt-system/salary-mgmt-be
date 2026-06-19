@@ -28,17 +28,37 @@ describe('AppController (e2e)', () => {
   });
 
   it('/employees (GET)', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/employees')
-      .expect(200);
+    const res = await request(app.getHttpServer()).get('/employees').expect(200);
 
-    expect(res.body).toHaveProperty('data');
-    expect(res.body).toHaveProperty('total');
-    expect(res.body).toHaveProperty('page');
-    expect(res.body.page).toBe(1);
-    expect(res.body.data.length).toBeGreaterThan(0);
+    interface TestSalary {
+      baseSalary: number;
+    }
+    interface TestEmployee {
+      employeeCode: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      department: string;
+      designation: string;
+      country: string;
+      currency: string;
+      salaries: TestSalary[];
+    }
+    interface TestResponseBody {
+      data: TestEmployee[];
+      total: number;
+      page: number;
+    }
 
-    const employee = res.body.data[0];
+    const body = res.body as TestResponseBody;
+
+    expect(body).toHaveProperty('data');
+    expect(body).toHaveProperty('total');
+    expect(body).toHaveProperty('page');
+    expect(body.page).toBe(1);
+    expect(body.data.length).toBeGreaterThan(0);
+
+    const employee = body.data[0];
     expect(employee).toHaveProperty('employeeCode');
     expect(employee).toHaveProperty('firstName');
     expect(employee).toHaveProperty('lastName');
@@ -52,9 +72,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('/employees/:id (GET) with invalid uuid', () => {
-    return request(app.getHttpServer())
-      .get('/employees/not-a-uuid')
-      .expect(400);
+    return request(app.getHttpServer()).get('/employees/not-a-uuid').expect(400);
   });
 
   afterEach(async () => {

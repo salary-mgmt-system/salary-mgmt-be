@@ -1,13 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
 import { EmployeesService } from './employees.service';
 import { Employee } from './entities/employee.entity';
 
 describe('EmployeesService', () => {
   let service: EmployeesService;
-  let repo: Repository<Employee>;
 
   const mockEmployee = {
     id: 'mock-id',
@@ -63,7 +61,6 @@ describe('EmployeesService', () => {
     }).compile();
 
     service = module.get<EmployeesService>(EmployeesService);
-    repo = module.get<Repository<Employee>>(getRepositoryToken(Employee));
   });
 
   afterEach(() => {
@@ -78,7 +75,7 @@ describe('EmployeesService', () => {
     it('should query employees with default filters and sorting', async () => {
       const result = await service.findAll({ page: 1, pageSize: 10 });
 
-      expect(repo.createQueryBuilder).toHaveBeenCalledWith('employee');
+      expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('employee');
       expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
         'employee.salaries',
         'salary',
@@ -128,7 +125,7 @@ describe('EmployeesService', () => {
 
       const result = await service.findOne('mock-id');
 
-      expect(repo.findOne).toHaveBeenCalledWith({
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'mock-id' },
         relations: { salaries: true },
       });
