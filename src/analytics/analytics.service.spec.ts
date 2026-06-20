@@ -179,4 +179,63 @@ describe('AnalyticsService', () => {
       expect(mkt).toBeUndefined();
     });
   });
+
+  describe('getSalaryDistribution', () => {
+    it('returns salary counts correctly grouped by USD brackets using country multipliers', async () => {
+      const mockEmployees = [
+        {
+          id: '1',
+          country: 'United States',
+          salaries: [{ baseSalary: 75000 }], // 75000 / 1.0 = 75000 (< $80k)
+        },
+        {
+          id: '2',
+          country: 'United Kingdom',
+          salaries: [{ baseSalary: 80000 }], // 80000 / 0.8 = 100000 ($80k - $120k)
+        },
+        {
+          id: '3',
+          country: 'Germany',
+          salaries: [{ baseSalary: 135000 }], // 135000 / 0.9 = 150000 ($120k - $160k)
+        },
+        {
+          id: '4',
+          country: 'Canada',
+          salaries: [{ baseSalary: 207000 }], // 207000 / 1.15 = 180000 ($160k - $200k)
+        },
+        {
+          id: '5',
+          country: 'India',
+          salaries: [{ baseSalary: 3300000 }], // 3300000 / 15.0 = 220000 ($200k - $240k)
+        },
+        {
+          id: '6',
+          country: 'United States',
+          salaries: [{ baseSalary: 260000 }], // 260000 / 1.0 = 260000 ($240k+)
+        },
+        {
+          id: '7',
+          country: 'India',
+          salaries: [], // no salary, should be ignored
+        },
+        {
+          id: '8',
+          country: 'Mexico', // fallback multiplier 1.0
+          salaries: [{ baseSalary: 75000 }], // 75000 / 1.0 = 75000 (< $80k)
+        },
+      ];
+
+      mockQueryBuilder.getMany.mockResolvedValueOnce(mockEmployees);
+
+      const result = await service.getSalaryDistribution();
+
+      expect(result).toHaveLength(6);
+      expect(result.find((r) => r.bracket === '< $80k')?.count).toBe(2);
+      expect(result.find((r) => r.bracket === '$80k - $120k')?.count).toBe(1);
+      expect(result.find((r) => r.bracket === '$120k - $160k')?.count).toBe(1);
+      expect(result.find((r) => r.bracket === '$160k - $200k')?.count).toBe(1);
+      expect(result.find((r) => r.bracket === '$200k - $240k')?.count).toBe(1);
+      expect(result.find((r) => r.bracket === '$240k+')?.count).toBe(1);
+    });
+  });
 });

@@ -3,6 +3,7 @@ import { AnalyticsController } from './analytics.controller';
 import { AnalyticsService } from './analytics.service';
 import { OverviewResponseDto } from './dto/overview-response.dto';
 import { GroupAnalyticsDto } from './dto/group-analytics.dto';
+import { DistributionResponseDto } from './dto/distribution-response.dto';
 
 describe('AnalyticsController', () => {
   let controller: AnalyticsController;
@@ -38,6 +39,13 @@ describe('AnalyticsController', () => {
     },
   ];
 
+  const mockDistribution: DistributionResponseDto[] = [
+    {
+      bracket: '< $80k',
+      count: 10,
+    },
+  ];
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AnalyticsController],
@@ -48,6 +56,7 @@ describe('AnalyticsController', () => {
             getOverview: jest.fn().mockResolvedValue(mockOverview),
             getCountryAnalytics: jest.fn().mockResolvedValue(mockCountryAnalytics),
             getDepartmentAnalytics: jest.fn().mockResolvedValue(mockDeptAnalytics),
+            getSalaryDistribution: jest.fn().mockResolvedValue(mockDistribution),
           },
         },
       ],
@@ -79,5 +88,13 @@ describe('AnalyticsController', () => {
 
     expect(spy).toHaveBeenCalled();
     expect(result).toEqual(mockDeptAnalytics);
+  });
+
+  it('getSalaryDistribution calls service.getSalaryDistribution', async () => {
+    const spy = jest.spyOn(service, 'getSalaryDistribution');
+    const result = await controller.getSalaryDistribution();
+
+    expect(spy).toHaveBeenCalled();
+    expect(result).toEqual(mockDistribution);
   });
 });

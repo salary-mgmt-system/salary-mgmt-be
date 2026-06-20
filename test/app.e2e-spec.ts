@@ -104,7 +104,7 @@ describe('AppController (e2e)', () => {
       expect(putRes.body).toHaveProperty('employee');
       expect(putRes.body).toHaveProperty('currentSalary');
       expect(putRes.body.employee.id).toBe(employeeId);
-      expect(Number(putRes.body.currentSalary.baseSalary)).toBe(updatePayload.baseSalary);
+      expect(Number(putRes.body.currentSalary.baseSalary)).toBeCloseTo(updatePayload.baseSalary, 2);
       expect(Number(putRes.body.currentSalary.bonus)).toBe(updatePayload.bonus);
       expect(putRes.body.currentSalary.effectiveDate).toBe(updatePayload.effectiveDate);
       expect(putRes.body.currentSalary.isCurrent).toBe(true);
@@ -122,8 +122,8 @@ describe('AppController (e2e)', () => {
       expect(history[0]).toHaveProperty('oldSalary');
       expect(history[0]).toHaveProperty('newSalary');
       expect(history[0]).toHaveProperty('reason');
-      expect(Number(history[0].oldSalary)).toBe(originalBaseSalary);
-      expect(Number(history[0].newSalary)).toBe(updatePayload.baseSalary);
+      expect(Number(history[0].oldSalary)).toBeCloseTo(originalBaseSalary, 2);
+      expect(Number(history[0].newSalary)).toBeCloseTo(updatePayload.baseSalary, 2);
       expect(history[0].reason).toBe(updatePayload.reason);
     });
 

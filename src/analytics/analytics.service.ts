@@ -5,6 +5,7 @@ import { Employee } from '../employees/entities/employee.entity';
 import { Salary } from '../salaries/entities/salary.entity';
 import { OverviewResponseDto } from './dto/overview-response.dto';
 import { GroupAnalyticsDto } from './dto/group-analytics.dto';
+import { DistributionResponseDto } from './dto/distribution-response.dto';
 
 @Injectable()
 export class AnalyticsService {
@@ -129,5 +130,57 @@ export class AnalyticsService {
         lowestSalary: this.round(Math.min(...salaries)),
       };
     });
+  }
+
+  async getSalaryDistribution(): Promise<DistributionResponseDto[]> {
+    const employees = await this.employeeRepository
+      .createQueryBuilder('employee')
+      .innerJoinAndSelect('employee.salaries', 'salary', 'salary.isCurrent = :isCurrent', {
+        isCurrent: true,
+      })
+      .select(['employee.id', 'employee.country', 'salary.id', 'salary.baseSalary'])
+      .getMany();
+
+    const multipliers: Record<string, number> = {
+      'United States': 1.0,
+      'United Kingdom': 0.8,
+      Germany: 0.9,
+      Canada: 1.15,
+      India: 15.0,
+    };
+
+    const brackets = [
+      { name: '< $80k', max: 80000 },
+      { name: '$80k - $120k', max: 120000 },
+      { name: '$120k - $160k', max: 160000 },
+      { name: '$160k - $200k', max: 200000 },
+      { name: '$200k - $240k', max: 240000 },
+      { name: '$240k+', max: Infinity },
+    ];
+
+    const counts: Record<string, number> = {};
+    for (const b of brackets) {
+      counts[b.name] = 0;
+    }
+
+    for (const emp of employees) {
+      const salary = emp.salaries?.[0]?.baseSalary;
+      if (salary === undefined) continue;
+
+      const multiplier = multipliers[emp.country] || 1.0;
+      const usdSalary = salary / multiplier;
+
+      for (const b of brackets) {
+        if (usdSalary < b.max) {
+          counts[b.name]++;
+          break;
+        }
+      }
+    }
+
+    return brackets.map((b) => ({
+      bracket: b.name,
+      count: counts[b.name],
+    }));
   }
 }
