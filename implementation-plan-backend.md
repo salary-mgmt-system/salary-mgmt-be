@@ -180,7 +180,7 @@ Analytics APIs and test suites are fully implemented.
 
 ---
 
-# Iteration 8 - Insights Module [In Progress]
+# Iteration 8 - Insights Module [Completed]
 
 ## Objective
 
@@ -203,7 +203,7 @@ HR managers can retrieve salary insights using predefined questions.
 
 ---
 
-# Iteration 9 - Production Readiness [To Do]
+# Iteration 9 - Production Readiness [Completed]
 
 ## Objective
 
