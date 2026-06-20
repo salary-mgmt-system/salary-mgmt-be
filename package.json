@@ -84,6 +84,7 @@
       "node_modules",
       "main.ts",
       ".module.ts",
+      ".dto.ts",
       "database/migrations",
       "database/seeds",
       "database/data-source.ts",
