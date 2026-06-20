@@ -152,7 +152,7 @@ Salary management workflow is operational.
 
 ---
 
-# Iteration 7 - Analytics Module
+# Iteration 7 - Analytics Module [Completed]
 
 ## Objective
 
@@ -176,11 +176,11 @@ Provide compensation reporting.
 
 ## Deliverable
 
-Analytics APIs provide dashboard-ready metrics.
+Analytics APIs and test suites are fully implemented.
 
 ---
 
-# Iteration 8 - Insights Module
+# Iteration 8 - Insights Module [In Progress]
 
 ## Objective
 
@@ -191,6 +191,7 @@ Support question-based salary insights.
 * Query parsing
 * Rule-based analytics lookup
 * Salary insights generation
+* Unit & integration tests for insights logic
 
 ## Endpoint
 
@@ -202,30 +203,11 @@ HR managers can retrieve salary insights using predefined questions.
 
 ---
 
-# Iteration 9 - Testing
+# Iteration 9 - Production Readiness [To Do]
 
 ## Objective
 
-Validate business logic.
-
-## Coverage
-
-* Employee Service
-* Salary Service
-* Analytics Service
-* Insights Service
-
-## Deliverable
-
-Core functionality is covered with meaningful unit tests.
-
----
-
-# Iteration 10 - Production Readiness
-
-## Objective
-
-Prepare backend for deployment.
+Prepare backend for final production verification.
 
 ## Tasks
 
@@ -237,24 +219,4 @@ Prepare backend for deployment.
 
 ## Deliverable
 
-Backend is stable and production-ready.
-
----
-
-# Iteration 11 - Deployment & Continuous Delivery
-
-## Objective
-
-Automate deployment.
-
-## Tasks
-
-* Configure Render deployment
-* Configure Neon PostgreSQL
-* Configure environment variables
-* Verify production deployment
-* Enable automatic deployment from main branch
-
-## Deliverable
-
-Backend is automatically deployed after successful merges.
+Backend is stable, documented, and production-ready.
